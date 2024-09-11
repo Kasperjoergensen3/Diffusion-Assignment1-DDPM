@@ -38,4 +38,4 @@ conda activate dif_A1
 cd image_diffusion_todo
 python fid/measure_fid.py \
     'data/afhq/eval' \
-    'results/diffusion-ddpm-09-09-083815/samples'
+    'results/diffusion-ddpm-09-11-075909/samples'

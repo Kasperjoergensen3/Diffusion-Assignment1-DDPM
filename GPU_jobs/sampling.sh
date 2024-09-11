@@ -37,5 +37,5 @@ conda activate dif_A1
 
 cd image_diffusion_todo
 python sampling.py \
-    --ckpt_path 'results/diffusion-ddpm-09-09-083815/last.ckpt' \
-    --save_dir 'results/diffusion-ddpm-09-09-083815/samples'
+    --ckpt_path 'results/diffusion-ddpm-09-11-075909/last.ckpt' \
+    --save_dir 'results/diffusion-ddpm-09-11-075909/samples'

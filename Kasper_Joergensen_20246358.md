@@ -23,42 +23,42 @@ Below I show the loss curve together with samples from the 2D distribution drawn
 
 # Task 2: Image Diffusion
 
-Below, I show 8 generated samples from my trained DDPM model. We can see that the generated images seem quite realistic, which is confirmed by a low FID score of 5.
+Below, I show 8 generated samples from my trained DDPM model. We can see that the generated images seem quite realistic, which is confirmed by a very low FID score of 3.
 
 <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;">
 
   <div>
-    <img src="./image_diffusion_todo/results/diffusion-ddpm-09-09-083815/samples/0.png" alt="Image 1" style="width: 100%;">
+    <img src="./assets/my_plots/0.png" alt="Image 1" style="width: 100%;">
   </div>
   
   <div>
-    <img src="./image_diffusion_todo/results/diffusion-ddpm-09-09-083815/samples/1.png" alt="Image 2" style="width: 100%;">
+    <img src="./assets/my_plots/1.png" alt="Image 2" style="width: 100%;">
   </div>
 
   <div>
-    <img src="./image_diffusion_todo/results/diffusion-ddpm-09-09-083815/samples/2.png" alt="Image 3" style="width: 100%;">
+    <img src="./assets/my_plots/2.png" alt="Image 3" style="width: 100%;">
   </div>
 
   <div>
-    <img src="./image_diffusion_todo/results/diffusion-ddpm-09-09-083815/samples/3.png" alt="Image 4" style="width: 100%;">
+    <img src="./assets/my_plots/3.png" alt="Image 4" style="width: 100%;">
   </div>
   
   <div>
-    <img src="./image_diffusion_todo/results/diffusion-ddpm-09-09-083815/samples/4.png" alt="Image 5" style="width: 100%;">
+    <img src="./assets/my_plots/4.png" alt="Image 5" style="width: 100%;">
   </div>
 
   <div>
-    <img src="./image_diffusion_todo/results/diffusion-ddpm-09-09-083815/samples/5.png" alt="Image 6" style="width: 100%;">
+    <img src="./assets/my_plots/5.png" alt="Image 6" style="width: 100%;">
   </div>
 
   <div>
-    <img src="./image_diffusion_todo/results/diffusion-ddpm-09-09-083815/samples/6.png" alt="Image 7" style="width: 100%;">
+    <img src="./assets/my_plots/6.png" alt="Image 7" style="width: 100%;">
   </div>
 
   <div>
-    <img src="./image_diffusion_todo/results/diffusion-ddpm-09-09-083815/samples/7.png" alt="Image 8" style="width: 100%;">
+    <img src="./assets/my_plots/7.png" alt="Image 8" style="width: 100%;">
   </div>
 </div>
   <div>
-    <img src="./assets/images/task2_my_fid_measure.png" style="width: 100%;">
+    <img src="./assets/my_plots/task2_my_fid_measure.png" style="width: 100%;">
   </div>
