@@ -4,19 +4,19 @@ by Kasper Joergensen (studentID: 20246358)
 
 # Task 1: 2D Plot Diffusion
 
-Below I show the loss curve together with samples from the 2D distribution drawn through the trained DDPM model. The samples seem good and have a Chamfer Distance of 8.4.
+Below I show the loss curve together with samples from the 2D distribution drawn through the trained DDPM model. The samples seem good and have a Chamfer Distance of 11.5. On repeated training runs I saw Chamfer Distance between 8 and 19.
 
 <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
   <div>
-    <img src="./assets/images/task1_my_loss_curve.png" style="width: 100%;">
+    <img src="./assets/my_plots/task1_my_loss_curve.png" style="width: 100%;">
   </div>
   <div>
-    <img src="./assets/images/task1_my_samples.png" style="width: 100%;">
+    <img src="./assets/my_plots/task1_my_samples.png" style="width: 100%;">
   </div>
 </div>
 </div>
   <div>
-    <img src="./assets/images/task1_my_cd_result.png" style="width: 100%;">
+    <img src="./assets/my_plots/task1_my_cd_result.png" style="width: 100%;">
   </div>
 
 <div style="page-break-after: always;"></div>
