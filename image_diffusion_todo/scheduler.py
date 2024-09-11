@@ -19,9 +19,7 @@ class BaseScheduler(nn.Module):
         if mode == "linear":
             betas = torch.linspace(beta_1, beta_T, steps=num_train_timesteps)
         elif mode == "quad":
-            betas = (
-                torch.linspace(beta_1**0.5, beta_T**0.5, num_train_timesteps) ** 2
-            )
+            betas = torch.linspace(beta_1**0.5, beta_T**0.5, num_train_timesteps) ** 2
         else:
             raise NotImplementedError(f"{mode} is not implemented.")
 
@@ -44,6 +42,7 @@ class BaseScheduler(nn.Module):
             ts = ts.to(device)
         return ts
 
+
 class DDPMScheduler(BaseScheduler):
     def __init__(
         self,
@@ -54,7 +53,7 @@ class DDPMScheduler(BaseScheduler):
         sigma_type="small",
     ):
         super().__init__(num_train_timesteps, beta_1, beta_T, mode)
-    
+
         # sigmas correspond to $\sigma_t$ in the DDPM paper.
         self.sigma_type = sigma_type
         if sigma_type == "small":
@@ -67,7 +66,7 @@ class DDPMScheduler(BaseScheduler):
             ) ** 0.5
         elif sigma_type == "large":
             # when $\sigma_t^2 = \beta_t$.
-            sigmas = self.betas ** 0.5
+            sigmas = self.betas**0.5
 
         self.register_buffer("sigmas", sigmas)
 
@@ -86,16 +85,24 @@ class DDPMScheduler(BaseScheduler):
         ######## TODO ########
         # DO NOT change the code outside this part.
         # Assignment 1. Implement the DDPM reverse step.
-        sample_prev = None
+        if isinstance(t, int):
+            t = torch.tensor([t])
+        t = t.to(x_t.device)
+        alphas_prod_t = self._get_teeth(self.alphas_cumprod, t)
+        alphas_t = self._get_teeth(self.alphas, t)
+        eps_factor = (1 - alphas_t) / (1 - alphas_prod_t).sqrt()
+        sigma_t = self._get_teeth(self.sigmas, t)
+        noise = torch.randn_like(x_t) if t > 1 else 0
+        sample_prev = (x_t - eps_factor * eps_theta) / alphas_t.sqrt() + sigma_t * noise
         #######################
-        
+
         return sample_prev
-    
+
     # https://nn.labml.ai/diffusion/ddpm/utils.html
-    def _get_teeth(self, consts: torch.Tensor, t: torch.Tensor): # get t th const 
+    def _get_teeth(self, consts: torch.Tensor, t: torch.Tensor):  # get t th const
         const = consts.gather(-1, t)
         return const.reshape(-1, 1, 1, 1)
-    
+
     def add_noise(
         self,
         x_0: torch.Tensor,
@@ -113,14 +120,19 @@ class DDPMScheduler(BaseScheduler):
             x_t: (`torch.Tensor [B,C,H,W]`): noisy samples at timestep t.
             eps: (`torch.Tensor [B,C,H,W]`): injected noise.
         """
-        
+
         if eps is None:
-            eps       = torch.randn(x_0.shape, device='cuda')
+            eps = torch.randn_like(x_0)
 
         ######## TODO ########
         # DO NOT change the code outside this part.
         # Assignment 1. Implement the DDPM forward step.
-        x_t = None
+        alphas_prod_t = self._get_teeth(self.alphas_cumprod, t)
+        x_t = alphas_prod_t.sqrt() * x_0 + (1 - alphas_prod_t).sqrt() * eps
         #######################
 
         return x_t, eps
+
+
+class DDIMScheduler(BaseScheduler):
+    pass

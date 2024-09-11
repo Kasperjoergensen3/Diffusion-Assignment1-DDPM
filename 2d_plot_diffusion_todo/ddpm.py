@@ -35,9 +35,7 @@ class BaseScheduler(nn.Module):
         if mode == "linear":
             betas = torch.linspace(beta_1, beta_T, steps=num_train_timesteps)
         elif mode == "quad":
-            betas = (
-                torch.linspace(beta_1**0.5, beta_T**0.5, num_train_timesteps) ** 2
-            )
+            betas = torch.linspace(beta_1**0.5, beta_T**0.5, num_train_timesteps) ** 2
         else:
             raise NotImplementedError(f"{mode} is not implemented.")
 
@@ -87,8 +85,7 @@ class DiffusionModule(nn.Module):
         # DO NOT change the code outside this part.
         # Compute xt.
         alphas_prod_t = extract(self.var_scheduler.alphas_cumprod, t, x0)
-        xt = x0
-
+        xt = alphas_prod_t.sqrt() * x0 + (1 - alphas_prod_t).sqrt() * noise
         #######################
 
         return xt
@@ -110,13 +107,13 @@ class DiffusionModule(nn.Module):
         # compute x_t_prev.
         if isinstance(t, int):
             t = torch.tensor([t]).to(self.device)
-        eps_factor = (1 - extract(self.var_scheduler.alphas, t, xt)) / (
-            1 - extract(self.var_scheduler.alphas_cumprod, t, xt)
-        ).sqrt()
+        alphas_prod_t = extract(self.var_scheduler.alphas_cumprod, t, xt)
+        alphas_t = extract(self.var_scheduler.alphas, t, xt)
+        eps_factor = (1 - alphas_t) / (1 - alphas_prod_t).sqrt()
         eps_theta = self.network(xt, t)
-
-        x_t_prev = xt
-
+        sigma_t = (1 - alphas_t).sqrt()  # sigma^2_t = beta_t
+        noise = torch.randn_like(xt) if t > 1 else 0
+        x_t_prev = (xt - eps_factor * eps_theta) / alphas_t.sqrt() + sigma_t * noise
         #######################
         return x_t_prev
 
@@ -133,8 +130,11 @@ class DiffusionModule(nn.Module):
         ######## TODO ########
         # DO NOT change the code outside this part.
         # sample x0 based on Algorithm 2 of DDPM paper.
-        x0_pred = torch.zeros(shape).to(self.device)
-
+        # Initialize x0_pred by random noise.
+        x0_pred = torch.randn(shape).to(self.device)
+        # Loop over timesteps in reverse order except for the last timestep (t=0).
+        for t in self.var_scheduler.timesteps[:-1]:
+            x0_pred = self.p_sample(x0_pred, t)
         ######################
         return x0_pred
 
@@ -220,9 +220,11 @@ class DiffusionModule(nn.Module):
             .to(x0.device)
             .long()
         )
-
-        loss = x0.mean()
-
+        eps = torch.randn_like(x0)
+        xt = self.q_sample(x0, t, eps)
+        eps_theta = self.network(xt, t)
+        # Note that the loss is scaled by the number of pixels.
+        loss = torch.mean((eps - eps_theta) ** 2, dim=1).mean()
         ######################
         return loss
 

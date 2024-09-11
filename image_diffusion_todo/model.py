@@ -5,7 +5,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from tqdm import tqdm
-    
+
 
 class DiffusionModule(nn.Module):
     def __init__(self, network, var_scheduler, **kwargs):
@@ -17,12 +17,17 @@ class DiffusionModule(nn.Module):
         ######## TODO ########
         # DO NOT change the code outside this part.
         # compute noise matching loss.
+        if noise is None:
+            noise = torch.randn_like(x0)
         B = x0.shape[0]
-        timestep = self.var_scheduler.uniform_sample_t(B, self.device)        
-        loss = x0.mean()
+        timestep = self.var_scheduler.uniform_sample_t(B, self.device)
+        xt, noise = self.var_scheduler.add_noise(x0, timestep, noise)
+        noise_theta = self.network(xt, timestep)
+        # Note that the loss is scaled by the number of pixels.
+        loss = torch.mean((noise - noise_theta) ** 2, dim=(1, 2, 3)).mean()
         ######################
         return loss
-    
+
     @property
     def device(self):
         return next(self.network.parameters()).device
@@ -39,7 +44,9 @@ class DiffusionModule(nn.Module):
         class_label: Optional[torch.Tensor] = None,
         guidance_scale: Optional[float] = 1.0,
     ):
-        x_T = torch.randn([batch_size, 3, self.image_resolution, self.image_resolution]).to(self.device)
+        x_T = torch.randn(
+            [batch_size, 3, self.image_resolution, self.image_resolution]
+        ).to(self.device)
 
         do_classifier_free_guidance = guidance_scale > 1.0
 
@@ -50,7 +57,9 @@ class DiffusionModule(nn.Module):
             # Specifically, given a tensor of shape (batch_size,) containing class labels,
             # create a tensor of shape (2*batch_size,) where the first half is filled with zeros (i.e., null condition).
             assert class_label is not None
-            assert len(class_label) == batch_size, f"len(class_label) != batch_size. {len(class_label)} != {batch_size}"
+            assert (
+                len(class_label) == batch_size
+            ), f"len(class_label) != batch_size. {len(class_label)} != {batch_size}"
             raise NotImplementedError("TODO")
             #######################
 
@@ -79,7 +88,7 @@ class DiffusionModule(nn.Module):
         hparams = {
             "network": self.network,
             "var_scheduler": self.var_scheduler,
-            } 
+        }
         state_dict = self.state_dict()
 
         dic = {"hparams": hparams, "state_dict": state_dict}
