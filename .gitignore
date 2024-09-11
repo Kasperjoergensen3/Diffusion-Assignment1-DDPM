@@ -6,7 +6,7 @@ results/
 outputs
 samples/
 .DS_Store
-
+*.ckpt
 # Solutions
 2d_plot_diffusion
 image_diffusion
