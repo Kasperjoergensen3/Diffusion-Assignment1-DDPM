@@ -92,7 +92,6 @@ class SimpleNet(nn.Module):
         )
         self.tail = TimeLinear(dim_hids[-1], dim_out, num_timesteps)
         self.relu = nn.ReLU()
-
         ######################
 
     def forward(self, x: torch.Tensor, t: torch.Tensor):
